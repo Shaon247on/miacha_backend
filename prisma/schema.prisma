@@ -1,0 +1,316 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Admin model for dashboard login
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+}
+
+// Main Appointment model
+model Appointment {
+  id              String         @id @default(cuid())
+  appointmentType AppointmentType
+  serviceType     ServiceType?
+  status          AppointmentStatus @default(PENDING)
+  
+  // User information
+  fullName        String
+  email           String
+  phoneNumber     String
+  address         String
+  
+  // Appointment details
+  preferredDate   DateTime
+  preferredTime   String
+  additionalNote  String?
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations to service-specific details
+  acRejuvenationDetails  AcRejuvenationDetails?
+  repairReplaceDetails   RepairReplaceDetails?
+  repairTuneUpDetails    RepairTuneUpDetails?
+  waterQualityDetails    WaterQualityDetails?
+  indoorAirQualityDetails IndoorAirQualityDetails?
+  serviceRequest         ServiceRequest?
+  
+  @@index([email])
+  @@index([status])
+  @@index([preferredDate])
+  @@map("appointments")
+}
+
+enum AppointmentType {
+  AC_REJUVENATION
+  REPAIR_OR_REPLACE
+  REPAIR_AND_TUNE_UP
+  WATER_QUALITY_SOLUTIONS
+  INDOOR_AIR_QUALITY
+}
+
+enum ServiceType {
+  RESIDENTIAL
+  COMMERCIAL
+  BOTH
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+// AC Rejuvenation specific details
+model AcRejuvenationDetails {
+  id                  String     @id @default(cuid())
+  appointmentId       String     @unique
+  appointment         Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  
+  acType              ACType
+  acAge               Int?
+  lastServiceDate     DateTime?
+  refrigerantType     RefrigerantType?
+  issues              String[]
+  currentPerformance  PerformanceRating?
+  
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@map("ac_rejuvenation_details")
+}
+
+// Repair or Replace specific details
+model RepairReplaceDetails {
+  id                  String     @id @default(cuid())
+  appointmentId       String     @unique
+  appointment         Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  
+  systemType          HVACSystemType
+  systemAge           Int?
+  currentIssue        String
+  emergency           Boolean    @default(false)
+  budgetRange         BudgetRange?
+  preferredSolution   PreferredSolution?
+  
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@map("repair_replace_details")
+}
+
+// Repair and Tune Up specific details
+model RepairTuneUpDetails {
+  id                  String     @id @default(cuid())
+  appointmentId       String     @unique
+  appointment         Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  
+  systemType          HVACSystemType
+  lastTuneUpDate      DateTime?
+  specificConcerns    String[]
+  noiseLevel          NoiseLevel?
+  energyEfficiency    EfficiencyRating?
+  
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@map("repair_tune_up_details")
+}
+
+// Water Quality Solutions specific details
+model WaterQualityDetails {
+  id                  String     @id @default(cuid())
+  appointmentId       String     @unique
+  appointment         Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  
+  propertyType        PropertyType
+  waterSource         WaterSource
+  waterIssues         WaterIssue[]
+  hasWaterSoftener    Boolean    @default(false)
+  hasFilterSystem     Boolean    @default(false)
+  numberOfBathrooms   Int?
+  
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@map("water_quality_details")
+}
+
+// Indoor Air Quality & Moisture Control specific details
+model IndoorAirQualityDetails {
+  id                  String     @id @default(cuid())
+  appointmentId       String     @unique
+  appointment         Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  
+  propertySizeSqFt    Int?
+  symptoms            AirQualitySymptom[]
+  hasHumidityIssue    Boolean    @default(false)
+  hasDustIssue        Boolean    @default(false)
+  hasOdorIssue        Boolean    @default(false)
+  occupantsWithAllergy Int?
+  currentSystem       String?
+  
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@map("indoor_air_quality_details")
+}
+
+// Service request model for follow-ups
+model ServiceRequest {
+  id              String       @id @default(cuid())
+  appointmentId   String       @unique
+  appointment     Appointment  @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  serviceType     String
+  description     String
+  priority        Priority     @default(MEDIUM)
+  status          RequestStatus @default(NEW)
+  estimatedCost   Float?
+  assignedTo      String?
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("service_requests")
+}
+
+// Enums for various fields
+enum ACType {
+  CENTRAL
+  DUCTLESS_MINI_SPLIT
+  WINDOW
+  PORTABLE
+  PACKAGED_TERMINAL
+}
+
+enum RefrigerantType {
+  R22
+  R410A
+  R32
+  R134A
+  UNKNOWN
+}
+
+enum PerformanceRating {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  NOT_WORKING
+}
+
+enum HVACSystemType {
+  AC_ONLY
+  HEAT_PUMP
+  FURNACE
+  BOILER
+  DUCTLESS
+  PACKAGED_UNIT
+}
+
+enum BudgetRange {
+  UNDER_500
+  BETWEEN_500_1000
+  BETWEEN_1000_2000
+  BETWEEN_2000_5000
+  OVER_5000
+  NOT_SURE
+}
+
+enum PreferredSolution {
+  REPAIR
+  REPLACE
+  UPGRADE
+  CONSULTATION
+}
+
+enum NoiseLevel {
+  NONE
+  MILD
+  MODERATE
+  SEVERE
+  VERY_LOUD
+}
+
+enum EfficiencyRating {
+  EXCELLENT
+  GOOD
+  AVERAGE
+  POOR
+  NOT_SURE
+}
+
+enum PropertyType {
+  RESIDENTIAL_HOUSE
+  RESIDENTIAL_APARTMENT
+  COMMERCIAL_OFFICE
+  INDUSTRIAL
+  OTHER
+}
+
+enum WaterSource {
+  MUNICIPAL
+  WELL
+  BOTH
+  OTHER
+}
+
+enum WaterIssue {
+  HARD_WATER
+  BAD_TASTE
+  BAD_ODOR
+  DISCOLORATION
+  SEDIMENT
+  CORROSION
+  SCALE_BUILDUP
+}
+
+enum AirQualitySymptom {
+  EXCESSIVE_DUST
+  MUSTY_ODOR
+  HIGH_HUMIDITY
+  LOW_HUMIDITY
+  ALLERGY_SYMPTOMS
+  RESPIRATORY_ISSUES
+  STATIC_ELECTRICITY
+  MOLD_GROWTH
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum RequestStatus {
+  NEW
+  IN_PROGRESS
+  QUOTED
+  APPROVED
+  COMPLETED
+  CANCELLED
+}
