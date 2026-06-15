@@ -175,14 +175,14 @@ export const getAllAppointments = async (req: AuthRequest, res: Response): Promi
         skip,
         take,
         orderBy: { createdAt: 'desc' },
-        // include: {
-        //   acRejuvenationDetails: true,
-        //   repairReplaceDetails: true,
-        //   repairTuneUpDetails: true,
-        //   waterQualityDetails: true,
-        //   indoorAirQualityDetails: true,
-        //   serviceRequest: true,
-        // },
+        include: {
+          acRejuvenationDetails: true,
+          repairReplaceDetails: true,
+          repairTuneUpDetails: true,
+          waterQualityDetails: true,
+          indoorAirQualityDetails: true,
+          serviceRequest: true,
+        },
       }),
       prisma.appointment.count({ where }),
     ]);

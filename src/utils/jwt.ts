@@ -12,17 +12,17 @@ interface JWTPayload {
 export const generateToken = (userId: string, email: string, role: string): string => {
   const payload: JWTPayload = { userId, email, role };
   
-  // Use the correct overload - pass secret as string and options as object
   return jwt.sign(payload, JWT_SECRET, { 
     expiresIn: JWT_EXPIRES_IN 
   } as jwt.SignOptions);
 };
 
-export const verifyToken = (token: string): JWTPayload | null => {
+export const verifyToken = (token: string): JWTPayload => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
     return decoded;
   } catch (error) {
-    return null;
+    // Throw the error instead of returning null
+    throw error;
   }
 };

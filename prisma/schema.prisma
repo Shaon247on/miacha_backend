@@ -9,13 +9,15 @@ datasource db {
 
 // Admin model for dashboard login
 model Admin {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  email          String   @unique
+  password       String
+  name           String
+  role           Role     @default(ADMIN)
+  resetToken     String?
+  resetExpiresAt DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@map("admins")
 }
@@ -24,6 +26,22 @@ enum Role {
   ADMIN
   SUPER_ADMIN
 }
+
+// OTP
+
+model OTP {
+  id        String   @id @default(cuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@index([email])
+  @@index([otp])
+  @@map("otps")
+}
+
 
 // Main Appointment model
 model Appointment {
@@ -196,6 +214,48 @@ model ServiceRequest {
 
   @@map("service_requests")
 }
+
+
+// faq model
+
+model FAQ {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?  // Admin ID who created it
+  updatedBy String?  // Admin ID who last updated it
+
+  @@index([isActive])
+  @@index([order])
+  @@map("faqs")
+}
+
+
+// About Us Story Section
+model AboutUsStory {
+  id              String   @id @default(cuid())
+  
+  // Main Story Section
+  title           String   @default("Our Story")
+  subtitle        String   @default("")
+  storyTitle      String   @default("How We Started")
+  storySubtitle   String   @default("")
+  
+  // Cards Section (max 3 cards)
+  cards           Json     @default("[]")  // Array of { cardTitle, cardSubtitle }
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?  // Admin ID who last updated
+  
+  @@map("about_us_story")
+}
+
 
 // Enums for various fields
 enum ACType {
