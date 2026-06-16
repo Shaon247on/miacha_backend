@@ -10,6 +10,7 @@ import appointmentRoutes from "./routes/appointment.routes";
 import faqRoutes from "./routes/faq.routes";
 import aboutUsStoryRoutes from "./routes/aboutUsStory.routes";
 import passwordResetRoutes from './routes/passwordReset.routes';
+import companySettingsRoutes from './routes/companySettings.routes';
 
 
 // Load environment variables
@@ -55,6 +56,10 @@ app.use("/api/faqs", faqRoutes);
 // About Us
 
 app.use("/api/about-us/story", aboutUsStoryRoutes);
+
+// Company Settings
+
+app.use("/api/company-settings", companySettingsRoutes)
 
 // Health check endpoint
 app.get("/health", (req: Request, res: Response) => {

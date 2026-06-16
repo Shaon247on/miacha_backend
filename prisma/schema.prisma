@@ -13,6 +13,7 @@ model Admin {
   email          String   @unique
   password       String
   name           String
+  avatar         String?
   role           Role     @default(ADMIN)
   resetToken     String?
   resetExpiresAt DateTime?
@@ -254,6 +255,38 @@ model AboutUsStory {
   updatedBy       String?  // Admin ID who last updated
   
   @@map("about_us_story")
+}
+
+// Company Settings Model
+
+model CompanySettings {
+  id              String   @id @default(cuid())
+  
+  // Company Information
+  companyName     String   @default("HVAC Service")
+  companyLogo     String?  // URL to logo image
+  companyFavicon  String?  // URL to favicon
+  
+  // Contact Information
+  contactEmail    String   @default("contact@hvacservices.com")
+  contactPhone    String   @default("(555) 123-4567")
+  contactAddress  String   @default("123 Main Street, Joliet, IL 60401")
+  
+  // Social Media Links
+  facebookUrl     String?
+  twitterUrl      String?
+  instagramUrl    String?
+  linkedinUrl     String?
+  
+  // Business Hours (JSON stored as string)
+  businessHours   Json?    @default("[]")
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?  // Admin ID who last updated
+  
+  @@map("company_settings")
 }
 
 
