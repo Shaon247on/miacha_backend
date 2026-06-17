@@ -1,1 +1,79 @@
-node_modules
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment variables (CRITICAL - prevents secret exposure)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Build outputs
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Prisma
+prisma/*.db
+prisma/*.sqlite
+prisma/migrations/*.sql
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Testing
+coverage/
+.nyc_output/
+
+# Database
+*.db
+*.sqlite
+*.sqlite-journal
+
+# Backups
+backups/
+*.backup
+*.bak
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+.cache/
+
+# Docker
+docker-compose.override.yml
+.docker/
+
+# Deployment
+.vercel
+.netlify
+.aws
+.heroku
+
+# Misc
+.env.production
+.env.development
+*.pem
+*.key
+*.crt

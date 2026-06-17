@@ -11,7 +11,8 @@ import faqRoutes from "./routes/faq.routes";
 import aboutUsStoryRoutes from "./routes/aboutUsStory.routes";
 import passwordResetRoutes from './routes/passwordReset.routes';
 import companySettingsRoutes from './routes/companySettings.routes';
-
+import chatRoutes from './routes/chat.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,8 @@ app.use(cors({
   exposedHeaders: ['Set-Cookie'],
 }));
 
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Middleware
 app.use(helmet({
@@ -60,6 +63,18 @@ app.use("/api/about-us/story", aboutUsStoryRoutes);
 // Company Settings
 
 app.use("/api/company-settings", companySettingsRoutes)
+
+// chatbot
+
+app.use('/api/chat', chatRoutes);
+
+
+// Dashboard
+
+app.use('/api/dashboard', dashboardRoutes);
+
+
+console.log('✅ Chat routes registered at /api/chat');
 
 // Health check endpoint
 app.get("/health", (req: Request, res: Response) => {

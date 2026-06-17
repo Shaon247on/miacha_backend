@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from 'cloudinary';
-import multer from 'multer';
+import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
 
 // Configure Cloudinary
 cloudinary.config({
@@ -12,33 +12,47 @@ cloudinary.config({
 const memoryStorage = multer.memoryStorage();
 
 // Create multer upload instance with 10MB limit
-export const upload = multer({ 
+export const upload = multer({
   storage: memoryStorage,
-  limits: { 
-    fileSize: 10 * 1024 * 1024 // 10MB limit
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fieldSize: 10 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/svg+xml'];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+      "image/webp",
+      "image/svg+xml",
+    ];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only JPEG, PNG, WEBP, and SVG are allowed.'));
+      cb(
+        new Error(
+          "Invalid file type. Only JPEG, PNG, WEBP, and SVG are allowed.",
+        ),
+      );
     }
   },
 });
 
 // Helper to upload buffer to Cloudinary
-export const uploadToCloudinary = async (buffer: Buffer, folder: string): Promise<string> => {
+export const uploadToCloudinary = async (
+  buffer: Buffer,
+  folder: string,
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder: folder,
-        transformation: [{ width: 500, height: 500, crop: 'limit' }],
+        transformation: [{ width: 500, height: 500, crop: "limit" }],
       },
       (error, result) => {
         if (error) reject(error);
         else resolve(result!.secure_url);
-      }
+      },
     );
     uploadStream.end(buffer);
   });
@@ -50,7 +64,7 @@ export const deleteFromCloudinary = async (publicId: string) => {
     await cloudinary.uploader.destroy(publicId);
     return true;
   } catch (error) {
-    console.error('Error deleting from Cloudinary:', error);
+    console.error("Error deleting from Cloudinary:", error);
     return false;
   }
 };
