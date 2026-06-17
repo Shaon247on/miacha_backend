@@ -4,6 +4,7 @@ import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import prisma from "./lib/prisma";
 import authRoutes from "./routes/auth.routes";
 import appointmentRoutes from "./routes/appointment.routes";
@@ -13,6 +14,7 @@ import passwordResetRoutes from './routes/passwordReset.routes';
 import companySettingsRoutes from './routes/companySettings.routes';
 import chatRoutes from './routes/chat.routes';
 import dashboardRoutes from './routes/dashboard.routes';
+import blogRoutes from './routes/blog.routes';
 
 // Load environment variables
 dotenv.config();
@@ -20,9 +22,11 @@ dotenv.config();
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
 
+// ============================================================
+// MIDDLEWARE - Order matters!
+// ============================================================
 
-// CORS
-
+// 1. CORS (ONCE, with proper configuration)
 app.use(cors({
   origin: 'http://localhost:3001',
   credentials: true,
@@ -31,50 +35,54 @@ app.use(cors({
   exposedHeaders: ['Set-Cookie'],
 }));
 
+// 2. Body parsers (ONCE, with increased limit)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Middleware
+// 3. Cookie parser
+app.use(cookieParser());
+
+// 4. Security & logging
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
-app.use(cors());
 app.use(compression());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// Routes
-app.use("/api/auth", authRoutes);
+// ============================================================
+// ROUTES
+// ============================================================
 
+// Auth routes
+app.use("/api/auth", authRoutes);
 app.use('/api/auth', passwordResetRoutes);
 
 // Appointments
 app.use("/api/appointments", appointmentRoutes);
 
 // FAQ
-
 app.use("/api/faqs", faqRoutes);
 
 // About Us
-
 app.use("/api/about-us/story", aboutUsStoryRoutes);
 
 // Company Settings
+app.use("/api/company-settings", companySettingsRoutes);
 
-app.use("/api/company-settings", companySettingsRoutes)
-
-// chatbot
-
+// Chatbot
 app.use('/api/chat', chatRoutes);
 
-
 // Dashboard
-
 app.use('/api/dashboard', dashboardRoutes);
 
+// Blogs
+app.use('/api/blogs', blogRoutes);
 
-console.log('✅ Chat routes registered at /api/chat');
+console.log('✅ All routes registered');
+
+// ============================================================
+// HEALTH & TEST ENDPOINTS
+// ============================================================
 
 // Health check endpoint
 app.get("/health", (req: Request, res: Response) => {
@@ -127,15 +135,29 @@ app.get("/", (req: Request, res: Response) => {
       faqs: {
         getAll: "GET /api/faqs (Public)",
         getById: "GET /api/faqs/:id (Public)",
-        getCategories: "GET /api/faqs/categories (Public)",
         create: "POST /api/faqs (Protected)",
         update: "PUT /api/faqs/:id (Protected)",
         delete: "DELETE /api/faqs/:id (Protected)",
         bulkOrder: "PATCH /api/faqs/bulk-order (Protected)",
       },
+      blogs: {
+        getAll: "GET /api/blogs (Public)",
+        getById: "GET /api/blogs/:slug (Public)",
+        create: "POST /api/blogs (Protected)",
+        update: "PUT /api/blogs/:id (Protected)",
+        delete: "DELETE /api/blogs/:id (Protected)",
+        categories: "GET /api/blogs/categories (Public)",
+      },
+      dashboard: {
+        get: "GET /api/dashboard (Protected)",
+      },
     },
   });
 });
+
+// ============================================================
+// ERROR HANDLING
+// ============================================================
 
 // 404 handler
 app.use((req: Request, res: Response) => {
@@ -155,10 +177,14 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-// Start server
+// ============================================================
+// START SERVER
+// ============================================================
+
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
   console.log(`🔐 Auth endpoint: http://localhost:${PORT}/api/auth/login`);
+  console.log(`📊 Dashboard: http://localhost:${PORT}/api/dashboard`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
 });

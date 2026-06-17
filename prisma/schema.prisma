@@ -290,6 +290,32 @@ model CompanySettings {
 }
 
 
+// Blog model
+model Blog {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  excerpt       String
+  content       String   @db.Text
+  image         String?
+  author        String
+  publishedDate DateTime @default(now())
+  category      String
+  readingTime   Int      @default(5)
+  relatedBlogIds String[] @default([])
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  createdBy     String?
+  updatedBy     String?
+
+  @@index([slug])
+  @@index([category])
+  @@index([isActive])
+  @@index([publishedDate])
+  @@map("blogs")
+}
+
 // Enums for various fields
 enum ACType {
   CENTRAL
