@@ -15,6 +15,8 @@ import companySettingsRoutes from './routes/companySettings.routes';
 import chatRoutes from './routes/chat.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import blogRoutes from './routes/blog.routes';
+import hvacEstimateRoutes from './routes/hvacEstimate.routes';
+
 
 // Load environment variables
 dotenv.config();
@@ -77,6 +79,9 @@ app.use('/api/dashboard', dashboardRoutes);
 
 // Blogs
 app.use('/api/blogs', blogRoutes);
+
+// estimate quote servicev
+app.use('/api/hvac-estimate', hvacEstimateRoutes);
 
 console.log('✅ All routes registered');
 

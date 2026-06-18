@@ -9,16 +9,16 @@ datasource db {
 
 // Admin model for dashboard login
 model Admin {
-  id             String   @id @default(cuid())
-  email          String   @unique
+  id             String    @id @default(cuid())
+  email          String    @unique
   password       String
   name           String
   avatar         String?
-  role           Role     @default(ADMIN)
+  role           Role      @default(ADMIN)
   resetToken     String?
   resetExpiresAt DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@map("admins")
 }
@@ -37,43 +37,43 @@ model OTP {
   expiresAt DateTime
   isUsed    Boolean  @default(false)
   createdAt DateTime @default(now())
-  
+
   @@index([email])
   @@index([otp])
   @@map("otps")
 }
 
-
 // Main Appointment model
 model Appointment {
-  id              String         @id @default(cuid())
+  id              String            @id @default(cuid())
   appointmentType AppointmentType
   serviceType     ServiceType?
   status          AppointmentStatus @default(PENDING)
-  
+
   // User information
-  fullName        String
-  email           String
-  phoneNumber     String
-  address         String
-  
+  fullName    String
+  email       String
+  phoneNumber String
+  address     String
+
   // Appointment details
-  preferredDate   DateTime
-  preferredTime   String
-  additionalNote  String?
-  
+  preferredDate  DateTime
+  preferredTime  String
+  additionalNote String?
+
   // Timestamps
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations to service-specific details
-  acRejuvenationDetails  AcRejuvenationDetails?
-  repairReplaceDetails   RepairReplaceDetails?
-  repairTuneUpDetails    RepairTuneUpDetails?
-  waterQualityDetails    WaterQualityDetails?
+  acRejuvenationDetails   AcRejuvenationDetails?
+  repairReplaceDetails    RepairReplaceDetails?
+  repairTuneUpDetails     RepairTuneUpDetails?
+  waterQualityDetails     WaterQualityDetails?
   indoorAirQualityDetails IndoorAirQualityDetails?
-  serviceRequest         ServiceRequest?
-  
+  serviceRequest          ServiceRequest?
+  hvacQuote               HvacQuote?
+
   @@index([email])
   @@index([status])
   @@index([preferredDate])
@@ -86,6 +86,7 @@ enum AppointmentType {
   REPAIR_AND_TUNE_UP
   WATER_QUALITY_SOLUTIONS
   INDOOR_AIR_QUALITY
+  HVAC_ESTIMATE
 }
 
 enum ServiceType {
@@ -105,117 +106,116 @@ enum AppointmentStatus {
 
 // AC Rejuvenation specific details
 model AcRejuvenationDetails {
-  id                  String     @id @default(cuid())
-  appointmentId       String     @unique
-  appointment         Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  
-  acType              ACType
-  acAge               Int?
-  lastServiceDate     DateTime?
-  refrigerantType     RefrigerantType?
-  issues              String[]
-  currentPerformance  PerformanceRating?
-  
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  id            String      @id @default(cuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  acType             ACType
+  acAge              Int?
+  lastServiceDate    DateTime?
+  refrigerantType    RefrigerantType?
+  issues             String[]
+  currentPerformance PerformanceRating?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("ac_rejuvenation_details")
 }
 
 // Repair or Replace specific details
 model RepairReplaceDetails {
-  id                  String     @id @default(cuid())
-  appointmentId       String     @unique
-  appointment         Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  
-  systemType          HVACSystemType
-  systemAge           Int?
-  currentIssue        String
-  emergency           Boolean    @default(false)
-  budgetRange         BudgetRange?
-  preferredSolution   PreferredSolution?
-  
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  id            String      @id @default(cuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  systemType        HVACSystemType
+  systemAge         Int?
+  currentIssue      String
+  emergency         Boolean            @default(false)
+  budgetRange       BudgetRange?
+  preferredSolution PreferredSolution?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("repair_replace_details")
 }
 
 // Repair and Tune Up specific details
 model RepairTuneUpDetails {
-  id                  String     @id @default(cuid())
-  appointmentId       String     @unique
-  appointment         Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  
-  systemType          HVACSystemType
-  lastTuneUpDate      DateTime?
-  specificConcerns    String[]
-  noiseLevel          NoiseLevel?
-  energyEfficiency    EfficiencyRating?
-  
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  id            String      @id @default(cuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  systemType       HVACSystemType
+  lastTuneUpDate   DateTime?
+  specificConcerns String[]
+  noiseLevel       NoiseLevel?
+  energyEfficiency EfficiencyRating?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("repair_tune_up_details")
 }
 
 // Water Quality Solutions specific details
 model WaterQualityDetails {
-  id                  String     @id @default(cuid())
-  appointmentId       String     @unique
-  appointment         Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  
-  propertyType        PropertyType
-  waterSource         WaterSource
-  waterIssues         WaterIssue[]
-  hasWaterSoftener    Boolean    @default(false)
-  hasFilterSystem     Boolean    @default(false)
-  numberOfBathrooms   Int?
-  
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  id            String      @id @default(cuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  propertyType      PropertyType
+  waterSource       WaterSource
+  waterIssues       WaterIssue[]
+  hasWaterSoftener  Boolean      @default(false)
+  hasFilterSystem   Boolean      @default(false)
+  numberOfBathrooms Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("water_quality_details")
 }
 
 // Indoor Air Quality & Moisture Control specific details
 model IndoorAirQualityDetails {
-  id                  String     @id @default(cuid())
-  appointmentId       String     @unique
-  appointment         Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  
-  propertySizeSqFt    Int?
-  symptoms            AirQualitySymptom[]
-  hasHumidityIssue    Boolean    @default(false)
-  hasDustIssue        Boolean    @default(false)
-  hasOdorIssue        Boolean    @default(false)
+  id            String      @id @default(cuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  propertySizeSqFt     Int?
+  symptoms             AirQualitySymptom[]
+  hasHumidityIssue     Boolean             @default(false)
+  hasDustIssue         Boolean             @default(false)
+  hasOdorIssue         Boolean             @default(false)
   occupantsWithAllergy Int?
-  currentSystem       String?
-  
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  currentSystem        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("indoor_air_quality_details")
 }
 
 // Service request model for follow-ups
 model ServiceRequest {
-  id              String       @id @default(cuid())
-  appointmentId   String       @unique
-  appointment     Appointment  @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  serviceType     String
-  description     String
-  priority        Priority     @default(MEDIUM)
-  status          RequestStatus @default(NEW)
-  estimatedCost   Float?
-  assignedTo      String?
-  
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  id            String        @id @default(cuid())
+  appointmentId String        @unique
+  appointment   Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  serviceType   String
+  description   String
+  priority      Priority      @default(MEDIUM)
+  status        RequestStatus @default(NEW)
+  estimatedCost Float?
+  assignedTo    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("service_requests")
 }
-
 
 // faq model
 
@@ -227,87 +227,164 @@ model FAQ {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  createdBy String?  // Admin ID who created it
-  updatedBy String?  // Admin ID who last updated it
+  createdBy String? // Admin ID who created it
+  updatedBy String? // Admin ID who last updated it
 
   @@index([isActive])
   @@index([order])
   @@map("faqs")
 }
 
-
 // About Us Story Section
 model AboutUsStory {
-  id              String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // Main Story Section
-  title           String   @default("Our Story")
-  subtitle        String   @default("")
-  storyTitle      String   @default("How We Started")
-  storySubtitle   String   @default("")
-  
+  title         String @default("Our Story")
+  subtitle      String @default("")
+  storyTitle    String @default("How We Started")
+  storySubtitle String @default("")
+
   // Cards Section (max 3 cards)
-  cards           Json     @default("[]")  // Array of { cardTitle, cardSubtitle }
-  
+  cards Json @default("[]") // Array of { cardTitle, cardSubtitle }
+
   // Metadata
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  updatedBy       String?  // Admin ID who last updated
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  updatedBy String? // Admin ID who last updated
+
   @@map("about_us_story")
 }
 
 // Company Settings Model
 
 model CompanySettings {
-  id              String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // Company Information
-  companyName     String   @default("HVAC Service")
-  companyLogo     String?  // URL to logo image
-  companyFavicon  String?  // URL to favicon
-  
+  companyName    String  @default("HVAC Service")
+  companyLogo    String? // URL to logo image
+  companyFavicon String? // URL to favicon
+
   // Contact Information
-  contactEmail    String   @default("contact@hvacservices.com")
-  contactPhone    String   @default("(555) 123-4567")
-  contactAddress  String   @default("123 Main Street, Joliet, IL 60401")
-  
+  contactEmail   String @default("contact@hvacservices.com")
+  contactPhone   String @default("(555) 123-4567")
+  contactAddress String @default("123 Main Street, Joliet, IL 60401")
+
   // Social Media Links
-  facebookUrl     String?
-  twitterUrl      String?
-  instagramUrl    String?
-  linkedinUrl     String?
-  
+  facebookUrl  String?
+  twitterUrl   String?
+  instagramUrl String?
+  linkedinUrl  String?
+
   // Business Hours (JSON stored as string)
-  businessHours   Json?    @default("[]")
-  
+  businessHours Json? @default("[]")
+
   // Metadata
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  updatedBy       String?  // Admin ID who last updated
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  updatedBy String? // Admin ID who last updated
+
   @@map("company_settings")
 }
 
+// HVAC Estimate Settings (Admin configurable)
+model HvacEstimateSettings {
+  id String @id @default(cuid())
+
+  // Base rates (per sq ft)
+  baseRatePerSqFt  Float @default(5.00)
+  laborRatePerHour Float @default(75.00)
+  markupPercentage Float @default(25.00)
+
+  // System tiers
+  tier1Multiplier Float @default(1.0) // Economy
+  tier2Multiplier Float @default(1.3) // Standard
+  tier3Multiplier Float @default(1.7) // Premium
+
+  // Installation fees
+  installationBaseFee Float @default(1500.00)
+  permitFee           Float @default(200.00)
+  disposalFee         Float @default(150.00)
+
+  // Financing options
+  monthlyPaymentRate Float @default(0.02) // 2% of total
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+
+  @@map("hvac_estimate_settings")
+}
+
+// HVAC Quote (Stored when user submits)
+model HvacQuote {
+  id String @id @default(cuid())
+
+  // User info
+  fullName    String
+  email       String
+  phoneNumber String
+  address     String
+
+  // Home info
+  squareFootage Int
+  stories       Int
+  bedrooms      Int
+  heatingSource String
+
+  // Selected system
+  selectedTier Int // 1, 2, or 3
+  systemBrand  String
+  systemName   String
+  systemPrice  Float
+
+  // Quote details
+  retailPrice    Float
+  cashPrice      Float
+  onlineSavings  Float
+  monthlyPayment Float
+
+  // Schedule
+  preferredDate DateTime?
+  preferredTime String?
+  notes         String?
+
+  // Status
+  status      QuoteStatus @default(PENDING)
+  orderNumber String      @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  appointmentId String?      @unique
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+
+  @@index([email])
+  @@index([status])
+  @@map("hvac_quotes")
+}
 
 // Blog model
 model Blog {
-  id            String   @id @default(cuid())
-  slug          String   @unique
-  title         String
-  excerpt       String
-  content       String   @db.Text
-  image         String?
-  author        String
-  publishedDate DateTime @default(now())
-  category      String
-  readingTime   Int      @default(5)
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  excerpt        String
+  content        String   @db.Text
+  image          String?
+  author         String
+  publishedDate  DateTime @default(now())
+  category       String
+  readingTime    Int      @default(5)
   relatedBlogIds String[] @default([])
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  createdBy     String?
-  updatedBy     String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdBy      String?
+  updatedBy      String?
 
   @@index([slug])
   @@index([category])
@@ -317,6 +394,15 @@ model Blog {
 }
 
 // Enums for various fields
+
+enum QuoteStatus {
+  PENDING
+  REVIEWED
+  CONTACTED
+  CONVERTED
+  LOST
+}
+
 enum ACType {
   CENTRAL
   DUCTLESS_MINI_SPLIT
