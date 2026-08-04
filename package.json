@@ -11,7 +11,14 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:seed": "prisma db seed",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "docker:dev": "docker compose --profile dev up -d",
+    "docker:prod": "docker compose --profile prod up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:build": "docker compose build --no-cache",
+    "docker:seed": "docker exec -it hvac_backend_dev npx prisma db seed",
+    "docker:migrate": "docker exec -it hvac_backend_dev npx prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
